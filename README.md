@@ -102,5 +102,3 @@ http://localhost:3000
 
 ## License
 
-MIT
-# sherlock git init git add README.md git commit -m first commit git branch -M main git remote add origin https://github.com/MELcodes99/sherlock.git git push -u origin main

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { SolRouter } from '@solrouter/sdk';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const API_KEY = 'sk_solrouter_Nqlx42fmDBxZtvDASu4yw';
+const API_KEY = 'sk_solrouter_YOUR_KEY_HERE';
 
 const client = new SolRouter({ apiKey: API_KEY });
 const app = express();

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sherlock — DeFi Risk Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link 
+href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" 
+rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="app-shell">
+    <header class="header">
+      <div class="logo-block">
+        <svg class="logo-icon" viewBox="0 0 40 40" fill="none">
+          <circle cx="16" cy="16" r="10" stroke="var(--accent)" stroke-width="2.5"/>
+          <circle cx="16" cy="16" r="5" fill="var(--accent)" opacity="0.2"/>
+          <line x1="23" y1="23" x2="35" y2="35" stroke="var(--accent)" stroke-width="3" 
+stroke-linecap="round"/>
+          <circle cx="16" cy="16" r="2" fill="var(--accent)"/>
+        </svg>
+        <div>
+          <span class="logo-text">SHERLOCK</span>
+          <span class="logo-sub">DeFi Risk Intelligence</span>
+        </div>
+      </div>
+      <div class="header-badge">
+        <span class="badge-dot"></span>
+        <span>ENCRYPTED · LIVE</span>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="panel input-panel">
+        <div class="panel-label">// POSITION SCANNER</div>
+
+        <div class="input-group">
+          <label class="input-label">Wallet / Protocol</label>
+          <input type="text" id="walletInput" class="glass-input"
+            placeholder="0x... or protocol (e.g. Aave v3, Uniswap, Compound)" autocomplete="off"/>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Position Details <span class="optional">— improves 
+accuracy</span></label>
+          <textarea id="positionDetails" class="glass-textarea" rows="4"
+            placeholder="e.g. 3 ETH collateral on Aave v3, borrowed 4000 USDC at 65% LTV, health factor 1.4, 
+current ETH price $2800"></textarea>
+        </div>
+
+        <div class="risk-toggles">
+          <div class="toggle-label">SCAN FOR:</div>
+          <div class="toggles-row">
+            <button class="risk-toggle active" data-risk="liquidation">Liquidation</button>
+            <button class="risk-toggle active" data-risk="smart-contract">Smart Contract</button>
+            <button class="risk-toggle active" data-risk="impermanent-loss">Impermanent Loss</button>
+            <button class="risk-toggle active" data-risk="oracle">Oracle Attack</button>
+            <button class="risk-toggle" data-risk="governance">Governance</button>
+            <button class="risk-toggle" data-risk="depeg">Depeg</button>
+            <button class="risk-toggle" data-risk="rug">Rug Pull</button>
+          </div>
+        </div>
+
+        <button class="scan-btn" id="scanBtn">
+          <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+            <path d="M21 21L15 15M17 11C17 14.31 14.31 17 11 17C7.69 17 5 14.31 5 11C5 7.69 7.69 5 11 5C14.31 
+5 17 7.69 17 11Z"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span id="scanBtnText">ANALYZE POSITION</span>
+        </button>
+
+        <div class="encryption-notice">
+          <svg viewBox="0 0 16 16" fill="none" width="11" height="11">
+            <rect x="3" y="7" width="10" height="7" rx="1.5" stroke="var(--accent-green)" 
+stroke-width="1.3"/>
+            <path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="var(--accent-green)" stroke-width="1.3"/>
+          </svg>
+          Query encrypted end-to-end · Backend never sees your raw prompt
+        </div>
+      </section>
+
+      <section class="panel results-panel">
+        <div class="panel-label">// RISK REPORT</div>
+
+        <div id="emptyState" class="empty-state">
+          <svg viewBox="0 0 80 80" fill="none" width="72" height="72">
+            <circle cx="40" cy="40" r="30" stroke="var(--glass-border)" stroke-width="1.5" 
+stroke-dasharray="4 4"/>
+            <circle cx="40" cy="40" r="18" stroke="var(--glass-border)" stroke-width="1"/>
+            <path d="M40 28v12l7 4" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <p>Awaiting scan.<br/>Enter a position to begin.</p>
+        </div>
+
+        <div id="loadingState" class="loading-state hidden">
+          <div class="scanner-anim">
+            <div class="s-ring r1"></div>
+            <div class="s-ring r2"></div>
+            <div class="s-ring r3"></div>
+            <div class="s-dot"></div>
+          </div>
+          <div class="loading-text" id="loadingText">ENCRYPTING QUERY...</div>
+          <div class="loading-steps">
+            <div class="step" id="step1">Encrypting query</div>
+            <div class="step" id="step2">Routing to AI</div>
+            <div class="step" id="step3">Analyzing risks</div>
+            <div class="step" id="step4">Generating report</div>
+          </div>
+        </div>
+
+        <div id="resultsContent" class="results-content hidden">
+          <div class="score-block">
+            <div class="score-row">
+              <span class="score-label">OVERALL RISK SCORE</span>
+              <span class="score-value" id="scoreValue">—</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+            <div class="bar-ticks">
+              <span>LOW</span><span>MEDIUM</span><span>HIGH</span><span>CRITICAL</span>
+            </div>
+          </div>
+
+          <div class="summary-box" id="summaryBox"></div>
+          <div class="flags-list" id="flagsList"></div>
+
+          <div class="rec-box hidden" id="recBox">
+            <div class="rec-label">💡 RECOMMENDATION</div>
+            <p id="recText"></p>
+          </div>
+
+          <div class="report-footer">
+            <span id="reportMeta"></span>
+            <span class="enc-tag">
+              <svg viewBox="0 0 12 12" fill="none" width="10" height="10">
+                <rect x="2" y="5.5" width="8" height="5" rx="1" stroke="var(--accent-green)" 
+stroke-width="1"/>
+                <path d="M4 5.5V4a2 2 0 014 0v1.5" stroke="var(--accent-green)" stroke-width="1"/>
+              </svg>
+              E2E ENCRYPTED
+            </span>
+          </div>
+        </div>
+
+        <div id="errorState" class="error-state hidden">
+          <div class="error-icon">⚠</div>
+          <p id="errorMsg"></p>
+          <button class="retry-btn" id="retryBtn">TRY AGAIN</button>
+        </div>
+      </section>
+    </main>
+
+    <aside class="history-rail">
+      <div class="panel-label">// SCAN HISTORY</div>
+      <div id="historyList"><div class="history-empty">No scans yet</div></div>
+    </aside>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

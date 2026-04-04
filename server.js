@@ -12,7 +12,7 @@ const client = new SolRouter({ apiKey: API_KEY });
 async function verifyKey() {
   try {
     const balance = await client.getBalance();
-    console.log('✅ API key valid! Balance:', balance.balanceFormatted);
+    console.log('API key valid! Balance:', balance.balanceFormatted);
     return true;
   } catch (error) {
     return false;
@@ -23,9 +23,10 @@ async function startServer() {
   const valid = await verifyKey();
 
   if (!valid) {
-    console.error('❌ Invalid API key — please update API_KEY in server.js with a valid SolRouter key.');
-    console.error('🔑 Get your key at: https://solrouter.com');
-    process.exit(1); // stops the server from starting
+    console.error('Invalid API key.');
+    console.error('Update API_KEY in server.js');
+    console.error('Get your key at: https://solrouter.com');
+    process.exit(1);
   }
 
   const app = express();
@@ -38,17 +39,21 @@ async function startServer() {
     const { prompt } = req.body;
     if (!prompt) return res.status(400).json({ error: 'No prompt provided' });
 
-    console.log('🔍 Analyzing:', prompt.slice(0, 80) + '...');
+    console.log('Analyzing:', prompt.slice(0, 80) + '...');
 
-    const response = await client.chat(prompt).catch(err => {
-      console.error('❌ SolRouter error:', err.message);
+    const response = await client.chat(prompt, {
+      model: 'gpt-oss-20b',
+      encrypted: true,
+      useLiveSearch: true
+    }).catch(err => {
+      console.error('SolRouter error:', err.message);
       res.status(500).json({ error: err.message });
       return null;
     });
 
     if (!response) return;
 
-    console.log('✅ Raw response:', JSON.stringify(response).slice(0, 300));
+    console.log('Raw response:', JSON.stringify(response).slice(0, 300));
 
     const raw =
       response?.message ||
@@ -59,9 +64,9 @@ async function startServer() {
       (typeof response === 'string' ? response : null);
 
     if (!raw) {
-      console.error('❌ Unknown shape:', JSON.stringify(response));
+      console.error('Unknown shape:', JSON.stringify(response));
       return res.status(500).json({
-        error: `Unknown response shape. Keys received: ${Object.keys(response || {}).join(', ')}`
+        error: 'Unknown response shape. Keys: ' + Object.keys(response || {}).join(', ')
       });
     }
 
@@ -71,7 +76,7 @@ async function startServer() {
   app.get('/ping', (_, res) => res.json({ ok: true }));
 
   app.listen(3000, () => {
-    console.log('\n🕵️  Sherlock is live → http://localhost:3000\n');
+    console.log('Sherlock is live -> http://localhost:3000');
   });
 }
 

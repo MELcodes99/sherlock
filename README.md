@@ -62,6 +62,8 @@ npm install
 
 Open `server.js` and replace the placeholder with your real key:
 
+Run 'nano server.js' in Terminal or Command Prompt and search for :
+
 ```js
 const API_KEY = 'sk_solrouter_YOUR_KEY_HERE';
 ```
